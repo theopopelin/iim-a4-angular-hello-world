@@ -1,0 +1,40 @@
+stages:
+  -build
+  -tests
+  -deploy
+
+build:
+  stage: build
+  image: node:14
+  script :
+    - npm install
+    - npm install -g @angular/cli
+    - ng test --no-watch --no-progress
+  cache:
+  paths:
+    - ./node_modules
+  only:
+    - master
+
+
+#tests:
+# stage: tests
+# image :  circleci/node:14-browsers
+# script:
+#   - npm install
+#   - npm install -g @angular/cli
+#   - ng test --no-watch --no-progress
+# cache:
+#  paths:
+#    - ./node_modules
+# only:
+#   - master
+
+deploy:
+  stage: deploy
+  image: ruby:2.7
+  script:
+    - gem install dpl
+    - dpl --provider=heroku --app=$HEROKU_APP --api-key=$HEROKU_API_KEY --skip_cleanup=true
+  only:
+    - master
